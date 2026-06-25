@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPA — Sistema de Gestão Estratégica</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  :root {
+    --azul-ipa: #1A3A5C;
+    --azul-medio: #2A5A8C;
+    --azul-claro: #E8F0F8;
+    --laranja: #E8632A;
+    --laranja-claro: #FDF0EA;
+    --amarelo: #D4A017;
+    --amarelo-claro: #FDF8EA;
+    --verde: #2A7A4A;
+    --verde-claro: #EAF5EE;
+    --azul-eq: #2563EB;
+    --azul-eq-claro: #EFF6FF;
+    --cinza-100: #F6F7F9;
+    --cinza-200: #EAECF0;
+    --cinza-400: #9AA3B0;
+    --cinza-600: #4B5563;
+    --cinza-800: #1F2937;
+    --branco: #FFFFFF;
+    --sidebar-w: 240px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--cinza-100); color: var(--cinza-800); display: flex; min-height: 100vh; font-size: 14px; }
+  .sidebar { width: var(--sidebar-w); background: var(--azul-ipa); min-height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; z-index: 100; }
+  .sidebar-logo { padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .logo-eyebrow { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
+  .logo-name { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; }
+  .logo-verse { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px; font-style: italic; }
+  .sidebar-phase { margin: 16px 12px; background: rgba(255,255,255,0.07); border-radius: 8px; padding: 10px 12px; }
+  .phase-label { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
+  .phase-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .phase-years { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .sidebar-nav { padding: 8px 0; flex: 1; }
+  .nav-section { padding: 12px 16px 4px; font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; color: rgba(255,255,255,0.65); cursor: pointer; transition: all 0.15s; border-left: 3px solid transparent; font-size: 13px; font-weight: 500; }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+  .nav-item.active { background: rgba(255,255,255,0.1); color: #fff; border-left-color: var(--laranja); }
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+  .sidebar-footer { padding: 16px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: rgba(255,255,255,0.35); }
+  .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  .topbar { background: var(--branco); border-bottom: 1px solid var(--cinza-200); padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+  .topbar-title { font-size: 17px; font-weight: 700; color: var(--azul-ipa); }
+  .topbar-sub { font-size: 12px; color: var(--cinza-400); margin-top: 1px; }
+  .badge-fase { background: var(--azul-claro); color: var(--azul-medio); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+  .content { padding: 24px 28px; flex: 1; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .card { background: var(--branco); border-radius: 10px; border: 1px solid var(--cinza-200); padding: 20px; }
+  .card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cinza-400); margin-bottom: 12px; }
+  .stat-card { background: var(--branco); border-radius: 10px; border: 1px solid var(--cinza-200); padding: 18px 20px; }
+  .stat-label { font-size: 11px; color: var(--cinza-400); font-weight: 500; margin-bottom: 6px; }
+  .stat-value { font-size: 28px; font-weight: 800; color: var(--azul-ipa); line-height: 1; }
+  .stat-sub { font-size: 11px; color: var(--cinza-400); margin-top: 5px; }
+  .stat-trend { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; margin-top: 5px; }
+  .trend-up { color: var(--verde); }
+  .trend-neutral { color: var(--cinza-400); }
+  .okr-progress-bar { flex: 1; height: 6px; background: var(--cinza-200); border-radius: 10px; overflow: hidden; }
+  .okr-progress-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; }
+  .fill-laranja { background: var(--laranja); }
+  .fill-verde { background: var(--verde); }
+  .fill-amarelo { background: var(--amarelo); }
+  .kanban-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-items: start; }
+  .kanban-col { background: var(--cinza-100); border-radius: 10px; padding: 12px; border: 1px solid var(--cinza-200); }
+  .kanban-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .kanban-col-title { font-size: 12px; font-weight: 700; color: var(--cinza-600); text-transform: uppercase; letter-spacing: 0.07em; }
+  .kanban-col-count { background: var(--cinza-200); color: var(--cinza-600); font-size: 11px; font-weight: 700; border-radius: 10px; padding: 1px 7px; }
+  .kanban-card { background: var(--branco); border-radius: 8px; border: 1px solid var(--cinza-200); padding: 12px; margin-bottom: 8px; cursor: pointer; transition: box-shadow 0.15s, transform 0.15s; }
+  .kanban-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
+  .kanban-card-title { font-size: 13px; font-weight: 600; color: var(--cinza-800); line-height: 1.3; margin-bottom: 8px; }
+  .kanban-card-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+  .kanban-pill { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+  .pill-alta { background: #FEE2E2; color: #B91C1C; }
+  .pill-media { background: #FEF3C7; color: #92400E; }
+  .pill-baixa { background: var(--verde-claro); color: var(--verde); }
+  .kanban-due { font-size: 10px; color: var(--cinza-400); }
+  .kanban-resp { width: 22px; height: 22px; border-radius: 50%; font-size: 10px; font-weight: 700; color: var(--branco); display: flex; align-items: center; justify-content: center; }
+  .av-b { background: var(--azul-ipa); } .av-w { background: #7C3AED; } .av-r { background: #DB2777; } .av-c { background: #0891B2; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--azul-ipa); }
+  .section-sub { font-size: 12px; color: var(--cinza-400); margin-top: 2px; }
+  .btn-primary { background: var(--azul-ipa); color: #fff; border: none; border-radius: 7px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .btn-secondary { background: var(--branco); color: var(--cinza-800); border: 1px solid var(--cinza-200); border-radius: 7px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .mb-16 { margin-bottom: 16px; } .mb-24 { margin-bottom: 24px; }
+  .visit-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 10px; }
+  .status-novo { background: #EFF6FF; color: #1D4ED8; }
+  .status-acompanhando { background: #FEF3C7; color: #92400E; }
+  .status-membro { background: var(--verde-claro); color: var(--verde); }
+  .status-inativo { background: var(--cinza-200); color: var(--cinza-600); }
+  .visitante-table { width: 100%; border-collapse: collapse; }
+  .visitante-table th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cinza-400); background: var(--cinza-100); border-bottom: 1px solid var(--cinza-200); }
+  .visitante-table td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid var(--cinza-200); vertical-align: middle; }
+  .visitante-table tr:hover td { background: var(--cinza-100); }
+  .btn-wa { display: inline-flex; align-items: center; gap: 5px; background: #25D366; color: #fff; border: none; border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 600; cursor: pointer; text-decoration: none; }
+  .okr-objective { background: var(--branco); border: 1px solid var(--cinza-200); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+  .okr-obj-header { padding: 14px 18px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; user-select: none; }
+  .okr-obj-header:hover { background: var(--cinza-100); }
+  .okr-obj-num { font-size: 11px; font-weight: 700; color: var(--branco); background: var(--azul-ipa); border-radius: 4px; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .okr-obj-info { flex: 1; }
+  .okr-obj-title { font-size: 14px; font-weight: 600; color: var(--cinza-800); line-height: 1.3; margin-bottom: 8px; }
+  .okr-progress-bar-wrap { display: flex; align-items: center; gap: 10px; }
+  .okr-progress-pct { font-size: 12px; font-weight: 700; min-width: 32px; text-align: right; }
+  .okr-chevron { color: var(--cinza-400); font-size: 12px; transition: transform 0.2s; margin-top: 3px; }
+  .okr-objective.open .okr-chevron { transform: rotate(180deg); }
+  .okr-krs { display: none; border-top: 1px solid var(--cinza-200); padding: 12px 18px 16px 52px; }
+  .okr-objective.open .okr-krs { display: block; }
+  .kr-item { padding: 10px 0; border-bottom: 1px solid var(--cinza-200); }
+  .kr-item:last-child { border-bottom: none; }
+  .kr-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 12px; }
+  .kr-title { font-size: 12px; color: var(--cinza-600); line-height: 1.4; flex: 1; }
+  .kr-value { font-size: 12px; font-weight: 700; color: var(--azul-ipa); white-space: nowrap; }
+  .kr-bar { height: 4px; background: var(--cinza-200); border-radius: 10px; overflow: hidden; }
+  .kr-bar-fill { height: 100%; border-radius: 10px; }
+  .kr-meta { display: flex; gap: 12px; margin-top: 5px; }
+  .kr-tag { font-size: 10px; color: var(--cinza-400); }
+  .okr-period-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .okr-period-label { font-size: 13px; font-weight: 700; color: var(--azul-ipa); }
+  .okr-period-badge { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px; background: var(--azul-claro); color: var(--azul-medio); }
+  @media (max-width: 900px) { .grid-4 { grid-template-columns: 1fr 1fr; } .kanban-board { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-eyebrow">Igreja Presbiteriana</div>
+    <div class="logo-name">DoAlto</div>
+    <div class="logo-verse">Col 3.1–2 � Granja Marileusa</div>
+  </div>
+  <div class="sidebar-phase">
+    <div class="phase-label">Fase atual</div>
+    <div class="phase-name">Plantio</div>
+    <div class="phase-years">2026 – 2027</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Gestão</div>
+    <div class="nav-item active" onclick="showView('dashboard')"><span class="nav-icon">⊞</span> Painel geral</div>
+    <div class="nav-item" onclick="showView('okrs')"><span class="nav-icon">◎</span> OKRs</div>
+    <div class="nav-item" onclick="showView('kanban')"><span class="nav-icon">≡</span> Tarefas</div>
+    <div class="nav-section">Operação</div>
+    <div class="nav-item" onclick="showView('visitantes')"><span class="nav-icon">⊕</span> Visitantes</div>
+  </nav>
+  <div class="sidebar-footer">Sistema IPA v1.0 · Junho 2026</div>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <div><div class="topbar-title" id="topbar-title">Painel Geral</div><div class="topbar-sub" id="topbar-sub">Visão consolidada b· Junho 2026</div></div>
+    <span class="badge-fase">📍 Plantio 2026–2027</span>
+  </div>
+  <div class="content">
+
+  <!-- DASHBOARD -->
+  <div class="view active" id="view-dashboard">
+    <div class="grid-4 mb-24">
+      <div class="stat-card"><div class="stat-label">Membros ativos</div><div class="stat-value">100</div><div class="stat-trend trend-up">↑ crescendo</div></div>
+      <div class="stat-card"><div class="stat-label">Visitantes este mês</div><div class="stat-value">7</div><div class="stat-trend trend-neutral">→ em acompanhamento</div></div>
+      <div class="stat-card"><div class="stat-label">OKRs no prazo</div><div class="stat-value">2/3</div><div class="stat-trend trend-up">↑ 2º sem 2026</div></div>
+      <div class="stat-card"><div class="stat-label">Voluntários domingo</div><div class="stat-value">27</div><div class="stat-sub">7 infantil + 20 geral</div></div>
+    </div>
+    <div class="grid-2 mb-24">
+      <div class="card">
+        <div class="card-title">OKRs 2º Sem 2026 — Progresso</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;font-weight:600;">O1 — Estrutura de liderança</span><span style="font-size:13px;font-weight:700;color:var(--laranja);">15%</span></div><div class="okr-progress-bar"><div class="okr-progress-fill fill-laranja" style="width:15%"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;font-weight:600;">O2 — Multiplicação de grupos</span><span style="font-size:13px;font-weight:700;color:var(--amarelo);">10%</span></div><div class="okr-progress-bar"><div class="okr-progress-fill fill-amarelo" style="width:10%"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;font-weight:600;">O3 — Integração de novos membros</span><span style="font-size:13px;font-weight:700;color:var(--verde);">20%</span></div><div class="okr-progress-bar"><div class="okr-progress-fill fill-verde" style="width:20%"></div></div></div>
+        </div>
+        <div style="margin-top:14px;text-align:right;"><span onclick="showView('okrs')" style="font-size:12px;color:var(--azul-medio);cursor:pointer;font-weight:600;">Ver todos os OKRs →</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Tarefas prioritárias</div>
+        <div style="display:flex;flex-direction:column;gap:0;">
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--cinza-200);"><span style="font-size:14px;">🔴</span><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Identificar responsável por AV/mídia técnica</div><div style="font-size:11px;color:var(--cinza-400);">Bloqueante crítico — Jul/2026</div></div><span class="kanban-pill pill-alta">Alta</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--cinza-200);"><span style="font-size:14px;">🟡</span><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Definir coordenadores das 4 equipes coloridas</div><div style="font-size:11px;color:var(--cinza-400);">Julho cw Willian + Renilli</div></div><span class="kanban-pill pill-media">Média</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 0;"><span style="font-size:14px;">🟢</span><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Formatar Processo Conexão (visitante → membro)</div><div style="font-size:11px;color:var(--cinza-400);">Julho - Bernardo</div></div><span class="kanban-pill pill-baixa">Em andamento</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OKRs -->
+  <div class="view" id="view-okrs">
+    <div class="section-header mb-24"><div><div class="section-title">OKRs — Plantio 2026–2027</div><div class="section-sub">Atualizado pela equipe de planejamento</div></div></div>
+    <div class="okr-period-header"><span class="okr-period-label">2º Semestre 2026</span><span class="okr-period-badge">Em andamento</span></div>
+    <div class="okr-objective" id="okr1">
+      <div class="okr-obj-header" onclick="toggleOKR('okr1')"><div class="okr-obj-num">1</div><div class="okr-obj-info"><div class="okr-obj-title">Estabelecer estrutura de liderança ministerial funcional</div><div class="okr-progress-bar-wrap"><div class="okr-progress-bar"><div class="okr-progress-fill fill-laranja" style="width:15%"></div></div><span class="okr-progress-pct" style="color:var(--laranja);">15%</span></div></div><div class="okr-chevron">▼</div></div>
+      <div class="okr-krs">
+        <div class="kr-item"><div class="kr-header"><span class="kr-title">Workshop APECD + DISC realizado com 8+ líderes potenciais</span><span class="kr-value">0/1</span></div><div class="kr-bar"><div class="kr-bar-fill fill-laranja" style="width:0%"></div></div><div class="kr-meta"><span class="kr-tag">📅 Jul/2026</span><span class="kr-tag">👤 Bernardo</span></div></div>
+        <div class="kr-item"><div class="kr-header"><span class="kr-title">5+ líderes de Nível 1 nomeados e comissionados</span><span class="kr-value">0/5</span></div><div class="kr-bar"><div class="kr-bar-fill fill-laranja" style="width:0%"></div></div><div class="kr-meta"><span class="kr-tag">📅 Fun/Set 2026</span><span class="kr-tag">👤 Bernardo + Conselho</span></div></div>
+        <div class="kr-item"><div class="kr-header"><span class="kr-title">4 equipes coloridas com coordenadores definidos e rodando</span><span class="kr-value">0/4</span></div><div class="kr-bar"><div class="kr-bar-fill fill-laranja" style="width:0%"></div></div><div class="kr-meta"><span class="kr-tag">📅 Dez/2026</span><span class="kr-tag">👤 Willian</span></div></div>
+      </div>
+    </div>
+    <div class="okr-objective" id="okr2">
+      <div class="okr-obj-header" onclick="toggleOKR('okr2')"><div class="okr-obj-num">2</div><div class="okr-obj-info"><div class="okr-obj-title">Multiplicar e estruturar os pequenos grupos</div><div class="okr-progress-bar-wrap"><div class="okr-progress-bar"><div class="okr-progress-fill fill-amarelo" style="width:10%"></div></div><span class="okr-progress-pct" style="color:var(--amarelo);">10%</span></div></div><div class="okr-chevron">▼</div></div>
+      <div class="okr-krs"><div class="kr-item"><div class="kr-header"><span class="kr-title">Mapeamento de 100% dos membros em grupos ou fila de espera</span><span class="kr-value">10%</span></div><div class="kr-bar"><div class="kr-bar-fill fill-amarelo" style="width:10%"></div></div><div class="kr-meta"><span class="kr-tag">📅 Out/2026</span><span class="kr-tag">👤 Renilli</span></div></div></div>
+    </div>
+    <div class="okr-objective" id="okr3">
+      <div class="okr-obj-header" onclick="toggleOKR('okr3')"><div class="okr-obj-num">3</div><div class="okr-obj-info"><div class="okr-obj-title">Criar uma trajetória clara de integração para novos membros</div><div class="okr-progress-bar-wrap"><div class="okr-progress-bar"><div class="okr-progress-fill fill-verde" style="width:20%"></div></div><span class="okr-progress-pct" style="color:var(--verde);">20%</span></div></div><div class="okr-chevron">▼</div></div>
+      <div class="okr-krs"><div class="kr-item"><div class="kr-header"><span class="kr-title">Processo Conexão (visitante → membro) formatado e documentado</span><span class="kr-value">20%</span></div><div class="kr-bar"><div class="kr-bar-fill fill-verde" style="width:20%"></div></div><div class="kr-meta"><span class="kr-tag">📅 Jul/2026</span><span class="kr-tag">👤 Bernardo</span></div></div><div class="kr-item"><div class="kr-header"><span class="kr-title">Primeiro ciclo de integração executado com 5+ pessoas</span><span class="kr-value">0/5</span></div><div class="kr-bar"><div class="kr-bar-fill fill-verde" style="width:0%"></div></div><div class="kr-meta"><span class="kr-tag">📅 Nov/2026</span><span class="kr-tag">👤 Bernardo + Presbíteros</span></div></div></div>
+    </div>
+  </div>
+
+  <!-- KANBAN -->
+  <div class="view" id="view-kanban">
+    <div class="section-header mb-24"><div><div class="section-title">Tarefas — Equipe de Planejamento</div><div class="section-sub">Julho–Dezembro 2026</div></div></div>
+    <div class="kanban-board">
+      <div class="kanban-col"><div class="kanban-col-header"><span class="kanban-col-title">A fazer</span><span class="kanban-col-count">4</span></div>
+        <div class="kanban-card"><div class="kanban-card-title">Workshop APECD + DISC com líderes potenciais</div><div class="kanban-card-meta"><span class="kanban-pill pill-alta">Alta</span><span class="kanban-due">📅 Jul/2026</span><div class="kanban-resp av-b">B</div></div></div>
+        <div class="kanban-card"><div class="kanban-card-title">Mapear responsável por AV/mídia técnica</div><div class="kanban-card-meta"><span class="kanban-pill pill-alta">Alta</span><span class="kanban-due">📅 Jul/2026</span><div class="kanban-resp av-b">B</div></div></div>
+        <div class="kanban-card"><div class="kanban-card-title">Definir coordenadores 4 equipes coloridas</div><div class="kanban-card-meta"><span class="kanban-pill pill-media">Média</span><span class="kanban-due">📅 Jul/2026</span><div class="kanban-resp av-w">W</div></div></div>
+        <div class="kanban-card"><div class="kanban-card-title">Assembleia Geral — Orçamento 2027</div><div class="kanban-card-meta"><span class="kanban-pill pill-baixa">Baixa</span><span class="kanban-due">📅 Nov/2026</span><div class="kanban-resp av-w">W</div></div></div>
+      </div>
+      <div class="kanban-col"><div class="kanban-col-header"><span class="kanban-col-title">Em andamento</span><span class="kanban-col-count">3</span></div>
+        <div class="kanban-card"><div class="kanban-card-title">Formatar Processo Conexão (visitante → membro)</div><div class="kanban-card-meta"><span class="kanban-pill pill-alta">Alta</span><span class="kanban-due">📅 Jul/2026</span><div class="kanban-resp av-b">B</div></div></div>
+        <div class="kanban-card"><div class="kanban-card-title">Inventário 5 cases logísticos</div><div class="kanban-card-meta"><span class="kanban-pill pill-media">Média</span><span class="kanban-due">📅 Ago/2026</span><div class="kanban-resp av-c">C</div></div></div>
+        <div class="kanban-card"><div class="kanban-card-title">Mapeamento membros em pequenos grupos</div><div class="kanban-card-meta"><span class="kanban-pill pill-media">Média</span><span class="kanban-due">📅 Jul/2026</span><div class="kanban-resp av-r">R</div></div></div>
+      </div>
+      <div class="kanban-col"><div class="kanban-col-header"><span class="kanban-col-title">Revisão</span><span class="kanban-col-count">1</span></div>
+        <div class="kanban-card"><div class="kanban-card-title">OKRs 2027 — revisão final pós Checkpoint 2</div><div class="kanban-card-meta"><span class="kanban-pill pill-baixa">Baixa</span><span class="kanban-due">📅 Dez/2026</span><div class="kanban-resp av-w">W</div></div></div>
+      </div>
+      <div class="kanban-col"><div class="kanban-col-header"><span class="kanban-col-title">Concluído</span><span class="kanban-col-count">4</span></div>
+        <div class="kanban-card" style="opacity:0.65;"><div class="kanban-card-title">✓ Missão, Visão e 6 Valores definidos</div><div class="kanban-card-meta"><span class="kanban-pill pill-baixa">Feito</span><span class="kanban-due">📅 Jun/2026</span></div></div>
+        <div class="kanban-card" style="opacity:0.65;"><div class="kanban-card-title">✓ Checkpoint 1 — documento entregue</div><div class="kanban-card-meta"><span class="kanban-pill pill-baixa">Feito</span><span class="kanban-due">📅 Jun/2026</span></div></div>
+        <div class="kanban-card" style="opacity:0.65;"><div class="kanban-card-title">✓ Sistema 4 equipes coloridas desenhado</div><div class="kanban-card-meta"><span class="kanban-pill pill-baixa">Feito</span><span class="kanban-due">📅 Jun/2026</span></div></div>
+        <div class="kanban-card" style="opacity:0.65;"><div class="kanban-card-title">✓ Processo de nomeação 4Cs desenhado</div><div class="kanban-card-meta"><span class="kanban-pill pill-baixa">Feito</span><span class="kanban-due">📅 Jun/2026</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISITANTES -->
+  <div class="view" id="view-visitantes">
+    <div class="section-header mb-24"><div><div class="section-title">Visitantes — Trajetória de integração</div><div class="section-sub">Visitante → Acompanhamento → Membro</div></div></div>
+    <div class="card">
+      <table class="visitante-table">
+        <thead><tr><th>Nome</th><th>Primeira visita</th><th>Status</th><th>Responsável</th><th>Contato</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Ana Costa</strong></td><td>08/06/2026</td><td><span class="visit-status status-acompanhando">Em acompanhamento</span></td><td>Bernardo</td><td><a class="btn-wa" href="#" onclick="return false;">💬 WhatsApp</a></td></tr>
+          <tr><td><strong>Marcos Souza</strong></td><td>15/06/2026</td><td><span class="visit-status status-novo">Novo</span></td><td>— a definir</td><td><a class="btn-wa" href="#" onclick="return false;">💬 WhatsApp</a></td></tr>
+          <tr><td><strong>Família Rodrigues</strong></td><td>01/06/2026</td><td><span class="visit-status status-acompanhando">Em acompanhamento</span></td><td>Presbítero</td><td><a class="btn-wa" href="#" onclick="return false;">💬 WhatsApp</a></td></tr>
+          <tr><td><strong>Pedro Alves</strong></td><td>18/05/2026</td><td><span class="visit-status status-membro">Membro</span></td><td>—</td><td><a class="btn-wa" href="#" onclick="return false;">💬 WhatsApp</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  </div>
+</main>
+<script>
+  function showView(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    const titles = {'dashboard':{title:'Painel Geral',sub:'Visão consolidada · Junho 2026'},'okrs':{title:'OKRs',sub:'sPlantio 2026–2027 · Objetivos e resultados'},'kanban':{title:'Tarefas',sub:'Equipe de planejamento 2026'},'visitantes':{title:'Visitantes',sub:'Trajetória de integraçó'}};
+    if(titles[name]){document.getElementById('topbar-title').textContent=titles[name].title;document.getElementById('topbar-sub').textContent=titles[name].sub;}
+    document.querySelectorAll('.nav-item').forEach(item => { if(item.getAttribute('onclick')===`showView('${name}')`)item.classList.add('active'); });
+  }
+  function toggleOKR(id) { document.getElementById(id).classList.toggle('open'); }
+</script>
+</body>
+</html>
